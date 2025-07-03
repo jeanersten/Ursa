@@ -9,7 +9,15 @@ add_subdirectory ("vendor/spdlog-01.15")
 add_definitions (-DGLFW_INCLUDE_NONE)
 
 add_executable (Ursa
+  "source/Log.cpp"
   "source/Main.cpp"
+  "source/Shader.cpp"
+
+  "source/Log.hpp"
+  "source/Shader.hpp"
 )
+
+set_property (TARGET Ursa PROPERTY CXX_STANDARD 17)
+set_property (TARGET Ursa PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries (Ursa PRIVATE glad glfw spdlog::spdlog)
