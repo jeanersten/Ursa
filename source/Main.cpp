@@ -6,8 +6,13 @@
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
 
+#include <cstdint>
+
 void glfw_errorCallback(int error_code, const char* description);
 void glfw_framebufferSizeCallback(GLFWwindow* window, int width, int height);
+void glfw_keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+void glad_glPostCallback(void *ret, const char *name, GLADapiproc apiproc, int len_args, ...);
 
 int main()
 {
@@ -33,6 +38,7 @@ int main()
   }
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, glfw_framebufferSizeCallback);
+  glfwSetKeyCallback(window, glfw_keyCallback);
 
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
   {
@@ -40,14 +46,14 @@ int main()
     glfwTerminate();
     return -1;
   }
-  LOG_INFO("OpenGL Version  | {}", (const char*)glGetString(GL_VERSION));
+  gladSetGLPostCallback(glad_glPostCallback);
 
   GLfloat vertices[] = {
     // positions          // colors            // tex coords
-    -0.6f,  0.6f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,  2.0f,    // 0 top left
+    -0.6f,  0.6f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,    // 0 top left
     -0.6f, -0.6f,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,    // 1 bottom left
-     0.6f,  0.6f,  0.0f,  1.0f,  1.0f,  0.0f,  2.0f,  2.0f,    // 2 top right
-     0.6f, -0.6f,  0.0f,  0.0f,  1.0f,  1.0f,  2.0f,  0.0f     // 3 bottom right
+     0.6f,  0.6f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f,  1.0f,    // 2 top right
+     0.6f, -0.6f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,  0.0f     // 3 bottom right
   };
 
   GLuint indices[] = {
@@ -96,17 +102,17 @@ int main()
   glBindTexture(GL_TEXTURE_2D, textures[0]);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width[0], height[0], 0, GL_RGB, GL_UNSIGNED_BYTE, data[0]);
   glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glBindTexture(GL_TEXTURE_2D, textures[1]);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width[1], height[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, data[1]);
   glGenerateMipmap(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -149,9 +155,31 @@ int main()
 void glfw_errorCallback(int error_code, const char* description)
 {
   LOG_ERROR("[GLFW-{}] {}", error_code, description);
+  glfwTerminate();
+  exit(-1);
 }
 
 void glfw_framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
   glViewport(0, 0, width, height);
+}
+
+void glfw_keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+  {
+    glfwTerminate();
+    exit(-1);
+  }
+}
+
+void glad_glPostCallback(void *ret, const char *name, GLADapiproc apiproc, int len_args, ...)
+{
+  GLenum error_code = glad_glGetError();
+  if (error_code != GL_NO_ERROR)
+  {
+    LOG_ERROR("[OpenGL-{}] Post call in {}", error_code, name);
+    glfwTerminate();
+    exit(-1);
+  }
 }

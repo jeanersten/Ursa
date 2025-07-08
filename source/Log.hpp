@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include <memory>
@@ -14,6 +15,7 @@
 class Log
 {
 private:
+  static std::shared_ptr<spdlog::sinks::stderr_color_sink_mt> s_stderr_console;
   static std::shared_ptr<spdlog::logger> s_logger;
 
   Log();

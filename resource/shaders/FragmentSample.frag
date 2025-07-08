@@ -9,5 +9,5 @@ uniform sampler2D tex1;
 
 void main()
 {
-  fragment_color = mix(texture(tex0, texture_coordinates), texture(tex1, texture_coordinates), 0.5) * vec4(vertex_color, 1.0);
+  fragment_color = mix(texture(tex0, texture_coordinates), texture(tex1, texture_coordinates), 0.5);
 }

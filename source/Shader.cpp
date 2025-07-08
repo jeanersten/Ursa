@@ -98,8 +98,8 @@ void Shader::linkShaders(GLuint program_id, GLuint vertex_shader_id, GLuint frag
     std::vector<GLchar> error_log(error_log_length);
     glGetProgramInfoLog(program_id, error_log_length, &error_log_length, &error_log[0]);
     LOG_ERROR("[OpenGL] Failed to link shader!\n" 
-              "-- -------------^------------------------------------- -- \n\n"
-              "{}                                                        \n"
+              "-- -------------^------------------------------------- -- \n\n\n"
+              "{}                                                        \n\n"
               "-- --------------------------------------------------- -- ",
               error_log.data());
   }
