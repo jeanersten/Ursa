@@ -19,6 +19,7 @@ public:
 
   void use() const;
   void unuse() const;
+  GLuint getID() const;
   void setBool(const std::string& uniform_name, bool value) const;
   void setInt(const std::string& uniform_name, int value) const;
   void setFloat(const std::string& uniform_name, float value) const;

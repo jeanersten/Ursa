@@ -3,10 +3,13 @@
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
 
-#include <cstdint>
+#include <cstdlib>
 
 void glfw_errorCallback(int error_code, const char* description);
 void glfw_framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -133,7 +136,12 @@ int main()
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glm::mat4 trans(1.0f);
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    GLuint transform_location = glGetUniformLocation(shader_sample.getID(), "transform");
+
     shader_sample.use();
+    glUniformMatrix4fv(transform_location, 1, GL_FALSE, glm::value_ptr(trans));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
     glActiveTexture(GL_TEXTURE1);
